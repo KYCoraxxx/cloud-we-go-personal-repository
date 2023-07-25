@@ -14,7 +14,7 @@ import (
 type StudentServiceImpl struct{}
 
 const (
-	host     = "localhost"
+	host     = "corax.com.cn"
 	port     = 5432
 	user     = "postgres"
 	password = "root"
@@ -29,6 +29,7 @@ func QueryFromDatabase(id int32, student *demo.Student) error {
 		log.Fatal(err)
 		return err
 	}
+	student.Id = -1
 
 	query, err := database.Query("select * from student where id = " + strconv.Itoa(int(id)))
 	if err != nil {
@@ -40,6 +41,10 @@ func QueryFromDatabase(id int32, student *demo.Student) error {
 	student.College = new(demo.College)
 	for query.Next() {
 		err = query.Scan(&student.Id, &student.Name, &cid, &student.Sex)
+	}
+
+	if student.Id == -1 {
+		return nil
 	}
 
 	query, err = database.Query("select * from college where id = " + strconv.Itoa(cid))
@@ -150,11 +155,11 @@ func (s *StudentServiceImpl) Query(ctx context.Context, req *demo.QueryReq) (res
 		if err != nil {
 			return
 		}
-		if oldStudent.Id == 0 {
+		if oldStudent.Id == -1 {
 			var student = demo.Student{
-				Id:      0,
+				Id:      -1,
 				Name:    "Student Not Exist",
-				College: nil,
+				College: &demo.College{Name: "Unknown", Address: "Unknown"},
 				Email:   nil,
 			}
 			resp = &student
