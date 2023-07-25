@@ -26,7 +26,7 @@ func main() {
 
 	svr := demo.NewServer(new(StudentServiceImpl), server.WithServiceAddr(addr),
 		server.WithRegistry(r), server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-			ServiceName: "StudentService",
+			ServiceName: "student",
 		}), server.WithRegistryInfo(&registry.Info{
 			Tags: map[string]string{
 				"Cluster": "StudentCluster",

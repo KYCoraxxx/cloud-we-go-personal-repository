@@ -21,7 +21,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	methods := map[string]kitex.MethodInfo{
 		"Register": kitex.NewMethodInfo(registerHandler, newStudentServiceRegisterArgs, newStudentServiceRegisterResult, false),
 		"Query":    kitex.NewMethodInfo(queryHandler, newStudentServiceQueryArgs, newStudentServiceQueryResult, false),
-		"Port":     kitex.NewMethodInfo(portHandler, newStudentServicePortArgs, newStudentServicePortResult, false),
+		"GetPort":  kitex.NewMethodInfo(getPortHandler, newStudentServiceGetPortArgs, newStudentServiceGetPortResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "demo",
@@ -73,22 +73,22 @@ func newStudentServiceQueryResult() interface{} {
 	return demo.NewStudentServiceQueryResult()
 }
 
-func portHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*demo.StudentServicePortArgs)
-	realResult := result.(*demo.StudentServicePortResult)
-	success, err := handler.(demo.StudentService).Port(ctx, realArg.Req)
+func getPortHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*demo.StudentServiceGetPortArgs)
+	realResult := result.(*demo.StudentServiceGetPortResult)
+	success, err := handler.(demo.StudentService).GetPort(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newStudentServicePortArgs() interface{} {
-	return demo.NewStudentServicePortArgs()
+func newStudentServiceGetPortArgs() interface{} {
+	return demo.NewStudentServiceGetPortArgs()
 }
 
-func newStudentServicePortResult() interface{} {
-	return demo.NewStudentServicePortResult()
+func newStudentServiceGetPortResult() interface{} {
+	return demo.NewStudentServiceGetPortResult()
 }
 
 type kClient struct {
@@ -121,11 +121,11 @@ func (p *kClient) Query(ctx context.Context, req *demo.QueryReq) (r *demo.Studen
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) Port(ctx context.Context, req *demo.PortReq) (r *demo.PortResp, err error) {
-	var _args demo.StudentServicePortArgs
+func (p *kClient) GetPort(ctx context.Context, req *demo.GetPortReq) (r *demo.GetPortResp, err error) {
+	var _args demo.StudentServiceGetPortArgs
 	_args.Req = req
-	var _result demo.StudentServicePortResult
-	if err = p.c.Call(ctx, "Port", &_args, &_result); err != nil {
+	var _result demo.StudentServiceGetPortResult
+	if err = p.c.Call(ctx, "GetPort", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

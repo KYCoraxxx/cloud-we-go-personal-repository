@@ -9,12 +9,243 @@ import (
 	"strings"
 )
 
+type College struct {
+	Name    string `thrift:"name,1,required" frugal:"1,required,string" json:"name"`
+	Address string `thrift:"address,2" frugal:"2,default,string" json:"address"`
+}
+
+func NewCollege() *College {
+	return &College{}
+}
+
+func (p *College) InitDefault() {
+	*p = College{}
+}
+
+func (p *College) GetName() (v string) {
+	return p.Name
+}
+
+func (p *College) GetAddress() (v string) {
+	return p.Address
+}
+func (p *College) SetName(val string) {
+	p.Name = val
+}
+func (p *College) SetAddress(val string) {
+	p.Address = val
+}
+
+var fieldIDToName_College = map[int16]string{
+	1: "name",
+	2: "address",
+}
+
+func (p *College) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetName bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetName = true
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetName {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_College[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_College[fieldId]))
+}
+
+func (p *College) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Name = v
+	}
+	return nil
+}
+
+func (p *College) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Address = v
+	}
+	return nil
+}
+
+func (p *College) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("College"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *College) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("name", thrift.STRING, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Name); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *College) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("address", thrift.STRING, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Address); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *College) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("College(%+v)", *p)
+}
+
+func (p *College) DeepEqual(ano *College) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Address) {
+		return false
+	}
+	return true
+}
+
+func (p *College) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *College) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Address, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type Student struct {
 	Id      int32    `thrift:"id,1,required" frugal:"1,required,i32" json:"id"`
 	Name    string   `thrift:"name,2,required" frugal:"2,required,string" json:"name"`
-	College string   `thrift:"college,3,required" frugal:"3,required,string" json:"college"`
+	College *College `thrift:"college,3,required" frugal:"3,required,College" json:"college"`
 	Email   []string `thrift:"email,4,optional" frugal:"4,optional,list<string>" json:"email,omitempty"`
-	Sex     string   `thrift:"sex,5,required" frugal:"5,required,string" json:"sex"`
+	Sex     *string  `thrift:"sex,5,optional" frugal:"5,optional,string" json:"sex,omitempty"`
 }
 
 func NewStudent() *Student {
@@ -33,7 +264,12 @@ func (p *Student) GetName() (v string) {
 	return p.Name
 }
 
-func (p *Student) GetCollege() (v string) {
+var Student_College_DEFAULT *College
+
+func (p *Student) GetCollege() (v *College) {
+	if !p.IsSetCollege() {
+		return Student_College_DEFAULT
+	}
 	return p.College
 }
 
@@ -46,8 +282,13 @@ func (p *Student) GetEmail() (v []string) {
 	return p.Email
 }
 
+var Student_Sex_DEFAULT string
+
 func (p *Student) GetSex() (v string) {
-	return p.Sex
+	if !p.IsSetSex() {
+		return Student_Sex_DEFAULT
+	}
+	return *p.Sex
 }
 func (p *Student) SetId(val int32) {
 	p.Id = val
@@ -55,13 +296,13 @@ func (p *Student) SetId(val int32) {
 func (p *Student) SetName(val string) {
 	p.Name = val
 }
-func (p *Student) SetCollege(val string) {
+func (p *Student) SetCollege(val *College) {
 	p.College = val
 }
 func (p *Student) SetEmail(val []string) {
 	p.Email = val
 }
-func (p *Student) SetSex(val string) {
+func (p *Student) SetSex(val *string) {
 	p.Sex = val
 }
 
@@ -73,8 +314,16 @@ var fieldIDToName_Student = map[int16]string{
 	5: "sex",
 }
 
+func (p *Student) IsSetCollege() bool {
+	return p.College != nil
+}
+
 func (p *Student) IsSetEmail() bool {
 	return p.Email != nil
+}
+
+func (p *Student) IsSetSex() bool {
+	return p.Sex != nil
 }
 
 func (p *Student) Read(iprot thrift.TProtocol) (err error) {
@@ -84,7 +333,6 @@ func (p *Student) Read(iprot thrift.TProtocol) (err error) {
 	var issetId bool = false
 	var issetName bool = false
 	var issetCollege bool = false
-	var issetSex bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -123,7 +371,7 @@ func (p *Student) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.STRUCT {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -148,7 +396,6 @@ func (p *Student) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetSex = true
 			} else {
 				if err = iprot.Skip(fieldTypeId); err != nil {
 					goto SkipFieldError
@@ -180,11 +427,6 @@ func (p *Student) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetCollege {
 		fieldId = 3
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetSex {
-		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -224,10 +466,9 @@ func (p *Student) ReadField2(iprot thrift.TProtocol) error {
 }
 
 func (p *Student) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	p.College = NewCollege()
+	if err := p.College.Read(iprot); err != nil {
 		return err
-	} else {
-		p.College = v
 	}
 	return nil
 }
@@ -258,7 +499,7 @@ func (p *Student) ReadField5(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.Sex = v
+		p.Sex = &v
 	}
 	return nil
 }
@@ -343,10 +584,10 @@ WriteFieldEndError:
 }
 
 func (p *Student) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("college", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("college", thrift.STRUCT, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.College); err != nil {
+	if err := p.College.Write(oprot); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -387,14 +628,16 @@ WriteFieldEndError:
 }
 
 func (p *Student) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("sex", thrift.STRING, 5); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Sex); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
+	if p.IsSetSex() {
+		if err = oprot.WriteFieldBegin("sex", thrift.STRING, 5); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.Sex); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
 	}
 	return nil
 WriteFieldBeginError:
@@ -448,9 +691,9 @@ func (p *Student) Field2DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Student) Field3DeepEqual(src string) bool {
+func (p *Student) Field3DeepEqual(src *College) bool {
 
-	if strings.Compare(p.College, src) != 0 {
+	if !p.College.DeepEqual(src) {
 		return false
 	}
 	return true
@@ -468,9 +711,14 @@ func (p *Student) Field4DeepEqual(src []string) bool {
 	}
 	return true
 }
-func (p *Student) Field5DeepEqual(src string) bool {
+func (p *Student) Field5DeepEqual(src *string) bool {
 
-	if strings.Compare(p.Sex, src) != 0 {
+	if p.Sex == src {
+		return true
+	} else if p.Sex == nil || src == nil {
+		return false
+	}
+	if strings.Compare(*p.Sex, *src) != 0 {
 		return false
 	}
 	return true
@@ -871,243 +1119,20 @@ func (p *QueryReq) Field1DeepEqual(src int32) bool {
 	return true
 }
 
-type PortResp struct {
-	Success bool   `thrift:"success,1" frugal:"1,default,bool" json:"success"`
-	Message string `thrift:"message,2" frugal:"2,default,string" json:"message"`
+type GetPortReq struct {
 }
 
-func NewPortResp() *PortResp {
-	return &PortResp{}
+func NewGetPortReq() *GetPortReq {
+	return &GetPortReq{}
 }
 
-func (p *PortResp) InitDefault() {
-	*p = PortResp{}
+func (p *GetPortReq) InitDefault() {
+	*p = GetPortReq{}
 }
 
-func (p *PortResp) GetSuccess() (v bool) {
-	return p.Success
-}
+var fieldIDToName_GetPortReq = map[int16]string{}
 
-func (p *PortResp) GetMessage() (v string) {
-	return p.Message
-}
-func (p *PortResp) SetSuccess(val bool) {
-	p.Success = val
-}
-func (p *PortResp) SetMessage(val string) {
-	p.Message = val
-}
-
-var fieldIDToName_PortResp = map[int16]string{
-	1: "success",
-	2: "message",
-}
-
-func (p *PortResp) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.BOOL {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_PortResp[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *PortResp) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadBool(); err != nil {
-		return err
-	} else {
-		p.Success = v
-	}
-	return nil
-}
-
-func (p *PortResp) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.Message = v
-	}
-	return nil
-}
-
-func (p *PortResp) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
-	if err = oprot.WriteStructBegin("PortResp"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *PortResp) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("success", thrift.BOOL, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteBool(p.Success); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *PortResp) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("message", thrift.STRING, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Message); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *PortResp) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("PortResp(%+v)", *p)
-}
-
-func (p *PortResp) DeepEqual(ano *PortResp) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.Success) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.Message) {
-		return false
-	}
-	return true
-}
-
-func (p *PortResp) Field1DeepEqual(src bool) bool {
-
-	if p.Success != src {
-		return false
-	}
-	return true
-}
-func (p *PortResp) Field2DeepEqual(src string) bool {
-
-	if strings.Compare(p.Message, src) != 0 {
-		return false
-	}
-	return true
-}
-
-type PortReq struct {
-}
-
-func NewPortReq() *PortReq {
-	return &PortReq{}
-}
-
-func (p *PortReq) InitDefault() {
-	*p = PortReq{}
-}
-
-var fieldIDToName_PortReq = map[int16]string{}
-
-func (p *PortReq) Read(iprot thrift.TProtocol) (err error) {
+func (p *GetPortReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1150,8 +1175,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *PortReq) Write(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteStructBegin("PortReq"); err != nil {
+func (p *GetPortReq) Write(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteStructBegin("GetPortReq"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1172,17 +1197,181 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *PortReq) String() string {
+func (p *GetPortReq) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("PortReq(%+v)", *p)
+	return fmt.Sprintf("GetPortReq(%+v)", *p)
 }
 
-func (p *PortReq) DeepEqual(ano *PortReq) bool {
+func (p *GetPortReq) DeepEqual(ano *GetPortReq) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
+		return false
+	}
+	return true
+}
+
+type GetPortResp struct {
+	Port string `thrift:"port,1" frugal:"1,default,string" json:"port"`
+}
+
+func NewGetPortResp() *GetPortResp {
+	return &GetPortResp{}
+}
+
+func (p *GetPortResp) InitDefault() {
+	*p = GetPortResp{}
+}
+
+func (p *GetPortResp) GetPort() (v string) {
+	return p.Port
+}
+func (p *GetPortResp) SetPort(val string) {
+	p.Port = val
+}
+
+var fieldIDToName_GetPortResp = map[int16]string{
+	1: "port",
+}
+
+func (p *GetPortResp) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetPortResp[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *GetPortResp) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Port = v
+	}
+	return nil
+}
+
+func (p *GetPortResp) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetPortResp"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *GetPortResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("port", thrift.STRING, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Port); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *GetPortResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetPortResp(%+v)", *p)
+}
+
+func (p *GetPortResp) DeepEqual(ano *GetPortResp) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Port) {
+		return false
+	}
+	return true
+}
+
+func (p *GetPortResp) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Port, src) != 0 {
 		return false
 	}
 	return true
@@ -1193,7 +1382,7 @@ type StudentService interface {
 
 	Query(ctx context.Context, req *QueryReq) (r *Student, err error)
 
-	Port(ctx context.Context, req *PortReq) (r *PortResp, err error)
+	GetPort(ctx context.Context, req *GetPortReq) (r *GetPortResp, err error)
 }
 
 type StudentServiceClient struct {
@@ -1240,11 +1429,11 @@ func (p *StudentServiceClient) Query(ctx context.Context, req *QueryReq) (r *Stu
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *StudentServiceClient) Port(ctx context.Context, req *PortReq) (r *PortResp, err error) {
-	var _args StudentServicePortArgs
+func (p *StudentServiceClient) GetPort(ctx context.Context, req *GetPortReq) (r *GetPortResp, err error) {
+	var _args StudentServiceGetPortArgs
 	_args.Req = req
-	var _result StudentServicePortResult
-	if err = p.Client_().Call(ctx, "Port", &_args, &_result); err != nil {
+	var _result StudentServiceGetPortResult
+	if err = p.Client_().Call(ctx, "GetPort", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -1272,7 +1461,7 @@ func NewStudentServiceProcessor(handler StudentService) *StudentServiceProcessor
 	self := &StudentServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
 	self.AddToProcessorMap("Register", &studentServiceProcessorRegister{handler: handler})
 	self.AddToProcessorMap("Query", &studentServiceProcessorQuery{handler: handler})
-	self.AddToProcessorMap("Port", &studentServiceProcessorPort{handler: handler})
+	self.AddToProcessorMap("GetPort", &studentServiceProcessorGetPort{handler: handler})
 	return self
 }
 func (p *StudentServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1389,16 +1578,16 @@ func (p *studentServiceProcessorQuery) Process(ctx context.Context, seqId int32,
 	return true, err
 }
 
-type studentServiceProcessorPort struct {
+type studentServiceProcessorGetPort struct {
 	handler StudentService
 }
 
-func (p *studentServiceProcessorPort) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := StudentServicePortArgs{}
+func (p *studentServiceProcessorGetPort) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := StudentServiceGetPortArgs{}
 	if err = args.Read(iprot); err != nil {
 		iprot.ReadMessageEnd()
 		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
-		oprot.WriteMessageBegin("Port", thrift.EXCEPTION, seqId)
+		oprot.WriteMessageBegin("GetPort", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -1407,11 +1596,11 @@ func (p *studentServiceProcessorPort) Process(ctx context.Context, seqId int32, 
 
 	iprot.ReadMessageEnd()
 	var err2 error
-	result := StudentServicePortResult{}
-	var retval *PortResp
-	if retval, err2 = p.handler.Port(ctx, args.Req); err2 != nil {
-		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Port: "+err2.Error())
-		oprot.WriteMessageBegin("Port", thrift.EXCEPTION, seqId)
+	result := StudentServiceGetPortResult{}
+	var retval *GetPortResp
+	if retval, err2 = p.handler.GetPort(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetPort: "+err2.Error())
+		oprot.WriteMessageBegin("GetPort", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -1419,7 +1608,7 @@ func (p *studentServiceProcessorPort) Process(ctx context.Context, seqId int32, 
 	} else {
 		result.Success = retval
 	}
-	if err2 = oprot.WriteMessageBegin("Port", thrift.REPLY, seqId); err2 != nil {
+	if err2 = oprot.WriteMessageBegin("GetPort", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -2129,39 +2318,39 @@ func (p *StudentServiceQueryResult) Field0DeepEqual(src *Student) bool {
 	return true
 }
 
-type StudentServicePortArgs struct {
-	Req *PortReq `thrift:"req,1" frugal:"1,default,PortReq" json:"req"`
+type StudentServiceGetPortArgs struct {
+	Req *GetPortReq `thrift:"req,1" frugal:"1,default,GetPortReq" json:"req"`
 }
 
-func NewStudentServicePortArgs() *StudentServicePortArgs {
-	return &StudentServicePortArgs{}
+func NewStudentServiceGetPortArgs() *StudentServiceGetPortArgs {
+	return &StudentServiceGetPortArgs{}
 }
 
-func (p *StudentServicePortArgs) InitDefault() {
-	*p = StudentServicePortArgs{}
+func (p *StudentServiceGetPortArgs) InitDefault() {
+	*p = StudentServiceGetPortArgs{}
 }
 
-var StudentServicePortArgs_Req_DEFAULT *PortReq
+var StudentServiceGetPortArgs_Req_DEFAULT *GetPortReq
 
-func (p *StudentServicePortArgs) GetReq() (v *PortReq) {
+func (p *StudentServiceGetPortArgs) GetReq() (v *GetPortReq) {
 	if !p.IsSetReq() {
-		return StudentServicePortArgs_Req_DEFAULT
+		return StudentServiceGetPortArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *StudentServicePortArgs) SetReq(val *PortReq) {
+func (p *StudentServiceGetPortArgs) SetReq(val *GetPortReq) {
 	p.Req = val
 }
 
-var fieldIDToName_StudentServicePortArgs = map[int16]string{
+var fieldIDToName_StudentServiceGetPortArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *StudentServicePortArgs) IsSetReq() bool {
+func (p *StudentServiceGetPortArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *StudentServicePortArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *StudentServiceGetPortArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -2210,7 +2399,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_StudentServicePortArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_StudentServiceGetPortArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -2220,17 +2409,17 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *StudentServicePortArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewPortReq()
+func (p *StudentServiceGetPortArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewGetPortReq()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *StudentServicePortArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *StudentServiceGetPortArgs) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("Port_args"); err != nil {
+	if err = oprot.WriteStructBegin("GetPort_args"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -2257,7 +2446,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *StudentServicePortArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *StudentServiceGetPortArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -2274,14 +2463,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *StudentServicePortArgs) String() string {
+func (p *StudentServiceGetPortArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("StudentServicePortArgs(%+v)", *p)
+	return fmt.Sprintf("StudentServiceGetPortArgs(%+v)", *p)
 }
 
-func (p *StudentServicePortArgs) DeepEqual(ano *StudentServicePortArgs) bool {
+func (p *StudentServiceGetPortArgs) DeepEqual(ano *StudentServiceGetPortArgs) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -2293,7 +2482,7 @@ func (p *StudentServicePortArgs) DeepEqual(ano *StudentServicePortArgs) bool {
 	return true
 }
 
-func (p *StudentServicePortArgs) Field1DeepEqual(src *PortReq) bool {
+func (p *StudentServiceGetPortArgs) Field1DeepEqual(src *GetPortReq) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false
@@ -2301,39 +2490,39 @@ func (p *StudentServicePortArgs) Field1DeepEqual(src *PortReq) bool {
 	return true
 }
 
-type StudentServicePortResult struct {
-	Success *PortResp `thrift:"success,0,optional" frugal:"0,optional,PortResp" json:"success,omitempty"`
+type StudentServiceGetPortResult struct {
+	Success *GetPortResp `thrift:"success,0,optional" frugal:"0,optional,GetPortResp" json:"success,omitempty"`
 }
 
-func NewStudentServicePortResult() *StudentServicePortResult {
-	return &StudentServicePortResult{}
+func NewStudentServiceGetPortResult() *StudentServiceGetPortResult {
+	return &StudentServiceGetPortResult{}
 }
 
-func (p *StudentServicePortResult) InitDefault() {
-	*p = StudentServicePortResult{}
+func (p *StudentServiceGetPortResult) InitDefault() {
+	*p = StudentServiceGetPortResult{}
 }
 
-var StudentServicePortResult_Success_DEFAULT *PortResp
+var StudentServiceGetPortResult_Success_DEFAULT *GetPortResp
 
-func (p *StudentServicePortResult) GetSuccess() (v *PortResp) {
+func (p *StudentServiceGetPortResult) GetSuccess() (v *GetPortResp) {
 	if !p.IsSetSuccess() {
-		return StudentServicePortResult_Success_DEFAULT
+		return StudentServiceGetPortResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *StudentServicePortResult) SetSuccess(x interface{}) {
-	p.Success = x.(*PortResp)
+func (p *StudentServiceGetPortResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetPortResp)
 }
 
-var fieldIDToName_StudentServicePortResult = map[int16]string{
+var fieldIDToName_StudentServiceGetPortResult = map[int16]string{
 	0: "success",
 }
 
-func (p *StudentServicePortResult) IsSetSuccess() bool {
+func (p *StudentServiceGetPortResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *StudentServicePortResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *StudentServiceGetPortResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -2382,7 +2571,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_StudentServicePortResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_StudentServiceGetPortResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -2392,17 +2581,17 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *StudentServicePortResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewPortResp()
+func (p *StudentServiceGetPortResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewGetPortResp()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *StudentServicePortResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *StudentServiceGetPortResult) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("Port_result"); err != nil {
+	if err = oprot.WriteStructBegin("GetPort_result"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -2429,7 +2618,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *StudentServicePortResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *StudentServiceGetPortResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -2448,14 +2637,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *StudentServicePortResult) String() string {
+func (p *StudentServiceGetPortResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("StudentServicePortResult(%+v)", *p)
+	return fmt.Sprintf("StudentServiceGetPortResult(%+v)", *p)
 }
 
-func (p *StudentServicePortResult) DeepEqual(ano *StudentServicePortResult) bool {
+func (p *StudentServiceGetPortResult) DeepEqual(ano *StudentServiceGetPortResult) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -2467,7 +2656,7 @@ func (p *StudentServicePortResult) DeepEqual(ano *StudentServicePortResult) bool
 	return true
 }
 
-func (p *StudentServicePortResult) Field0DeepEqual(src *PortResp) bool {
+func (p *StudentServiceGetPortResult) Field0DeepEqual(src *GetPortResp) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false

@@ -30,14 +30,21 @@ func QueryFromDatabase(id int32, student *demo.Student) error {
 		return err
 	}
 
-	query, err := database.Query("select * from baseinfo where id = " + strconv.Itoa(int(id)))
+	query, err := database.Query("select * from student where id = " + strconv.Itoa(int(id)))
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
 
+	var cid int
+	student.College = new(demo.College)
 	for query.Next() {
-		err = query.Scan(&student.Id, &student.Name, &student.College, &student.Sex)
+		err = query.Scan(&student.Id, &student.Name, &cid, &student.Sex)
+	}
+
+	query, err = database.Query("select * from college where id = " + strconv.Itoa(cid))
+	for query.Next() {
+		err = query.Scan(&cid, &student.College.Name, &student.College.Address)
 	}
 
 	query, err = database.Query("select * from email where id = " + strconv.Itoa(int(id)))
@@ -69,38 +76,36 @@ func InsertIntoDatabase(student *demo.Student) error {
 	}
 
 	tx, err := database.Begin()
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
 
-	stmt, err := tx.Prepare("insert into baseinfo values ($1, $2, $3, $4)")
-	if err != nil {
-		fmt.Println("Statement Preparation Failed: ", err)
-		return err
+	var cid = -1
+	var cname string
+	var caddr string
+	query, err := database.Query("select * from college where name = " + "'" + student.College.Name + "'")
+	for query.Next() {
+		err = query.Scan(&cid, &cname, &caddr)
 	}
+	if cid == -1 {
+		stmt, _ := tx.Prepare("insert into college(name, address) values ($1, $2)")
+		_, err = stmt.Exec(student.College.Name, student.College.Address)
+		err = tx.Commit()
 
-	_, err = stmt.Exec(student.Id, student.Name, student.College, student.Sex)
-	if err != nil {
-		fmt.Println("Statement Execution Failed: ", err)
-		return err
+		query, err = database.Query("select * from college where name = " + "'" + student.College.Name + "'")
+		for query.Next() {
+			err = query.Scan(&cid, &cname, &caddr)
+		}
+
+		tx, err = database.Begin()
 	}
+	stmt, err := tx.Prepare("insert into student values ($1, $2, $3, $4)")
+
+	_, err = stmt.Exec(student.Id, student.Name, cid, student.Sex)
 
 	for i := 0; i < len(student.Email); i++ {
 		stmt, err = tx.Prepare("insert into email values ($1, $2)")
-		if err != nil {
-			fmt.Println("Statement Preparation Failed: ", err)
-			return err
-		}
-
 		_, err = stmt.Exec(student.Id, student.Email[i])
-		if err != nil {
-			fmt.Println("Statement Execution Failed: ", err)
-			return err
-		}
 	}
 
-	tx.Commit()
+	err = tx.Commit()
 	return nil
 }
 
@@ -149,7 +154,7 @@ func (s *StudentServiceImpl) Query(ctx context.Context, req *demo.QueryReq) (res
 			var student = demo.Student{
 				Id:      0,
 				Name:    "Student Not Exist",
-				College: "Student Not Exist",
+				College: nil,
 				Email:   nil,
 			}
 			resp = &student
@@ -161,10 +166,9 @@ func (s *StudentServiceImpl) Query(ctx context.Context, req *demo.QueryReq) (res
 	}
 }
 
-// Port implements the StudentServiceImpl interface.
-func (s *StudentServiceImpl) Port(ctx context.Context, portResp *demo.PortReq) (resp *demo.PortResp, err error) {
-	resp = new(demo.PortResp)
-	resp.Success = true
-	resp.Message = strconv.Itoa(bindPort)
+// GetPort implements the StudentServiceImpl interface.
+func (s *StudentServiceImpl) GetPort(ctx context.Context, req *demo.GetPortReq) (resp *demo.GetPortResp, err error) {
+	resp = new(demo.GetPortResp)
+	resp.Port = strconv.Itoa(bindPort)
 	return
 }

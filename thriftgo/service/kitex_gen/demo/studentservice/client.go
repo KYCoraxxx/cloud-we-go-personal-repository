@@ -13,7 +13,7 @@ import (
 type Client interface {
 	Register(ctx context.Context, student *demo.Student, callOptions ...callopt.Option) (r *demo.RegisterResp, err error)
 	Query(ctx context.Context, req *demo.QueryReq, callOptions ...callopt.Option) (r *demo.Student, err error)
-	Port(ctx context.Context, req *demo.PortReq, callOptions ...callopt.Option) (r *demo.PortResp, err error)
+	GetPort(ctx context.Context, req *demo.GetPortReq, callOptions ...callopt.Option) (r *demo.GetPortResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -55,7 +55,7 @@ func (p *kStudentServiceClient) Query(ctx context.Context, req *demo.QueryReq, c
 	return p.kClient.Query(ctx, req)
 }
 
-func (p *kStudentServiceClient) Port(ctx context.Context, req *demo.PortReq, callOptions ...callopt.Option) (r *demo.PortResp, err error) {
+func (p *kStudentServiceClient) GetPort(ctx context.Context, req *demo.GetPortReq, callOptions ...callopt.Option) (r *demo.GetPortResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.Port(ctx, req)
+	return p.kClient.GetPort(ctx, req)
 }
